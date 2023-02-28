@@ -1,4 +1,4 @@
-def dream_request(phrase):
+def lambda_handler(event, context):
 
     import os
     import os
@@ -68,4 +68,3 @@ def dream_request(phrase):
         return return_dict
     
 
-dream_request("expansive landscape rolling greens with blue daisies and weeping willow trees under a blue alien sky, artstation, masterful, ghibli")

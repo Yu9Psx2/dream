@@ -26,7 +26,7 @@ def lambda_handler(event, context):
     returned_messages, returned_options, returned_iterator, returned_good_flag, returned_end_flag = access_api(prompt=event['phrase'], 
                                                                                                                messages=story.get("returned_messages",None),
                                                                                                                user_response = story.get("user_response", None), 
-                                                                                                               good_flag = story.get("returned_good_flag", None), 
+                                                                                                               good_flag = story.get("returned_good_flag", True), 
                                                                                                                iterator = story.get("returned_iterator",0))
     return_dict['story'] = {"returned_messages":returned_messages, "returned_options":returned_options, "returned_iterator":returned_iterator, "returned_good_flag":returned_good_flag, "returned_end_flag":returned_end_flag}
     access_key=os.environ.get('REACT_APP_accessKeyId')

@@ -7,20 +7,28 @@ from stability_sdk import client
 import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 import boto3
 import logging
+from chat_gpt_call import access_api
+import json
+
 
 log = logging.getLogger(__name__)
 log_stream = io.StringIO()    
 logging.basicConfig(stream=log_stream, level=logging.INFO)
 def lambda_handler(event, context):
-
     #Code is modified from dream studio example found at: https://platform.stability.ai/docs/getting-started/authentication
-
     return_dict = {"completion": False,
                 "url": None,
                 "message":None,
                 }
     phrase = event['phrase']
-    
+    story = event.get('story',{})
+     #access chat GPT to progress the story:
+    returned_messages, returned_options, returned_iterator, returned_good_flag, returned_end_flag = access_api(prompt=event['phrase'], 
+                                                                                                               messages=story.get("returned_messages",None),
+                                                                                                               user_response = story.get("user_response", None), 
+                                                                                                               good_flag = story.get("returned_good_flag", None), 
+                                                                                                               iterator = story.get("returned_iterator",0))
+    return_dict['story'] = {"returned_messages":returned_messages, "returned_options":returned_options, "returned_iterator":returned_iterator, "returned_good_flag":returned_good_flag, "returned_end_flag":returned_end_flag}
     access_key=os.environ.get('REACT_APP_accessKeyId')
     secret_key=os.environ.get('REACT_APP_secretAccessKey')
     try:
@@ -44,7 +52,6 @@ def lambda_handler(event, context):
             prompt=phrase,   
             steps=30, 
             cfg_scale=8.0, 
-
             width=512, 
             height=512, 
             samples=1, 
@@ -58,10 +65,12 @@ def lambda_handler(event, context):
                 if artifact.type == generation.ARTIFACT_IMAGE:
                     img_bytes = io.BytesIO(artifact.binary)
                     img = Image.open(img_bytes)
-                    img.save("/tmp/" + str(artifact.seed)+ ".png") 
+                    img.save("/tmp/" + str(artifact.seed)+ ".png")
+                    # img.save(str(artifact.seed)+ ".png") 
                     img_bytes.seek(0)
                     bucket_name = bucket
-                    key = "/tmp/" + str(artifact.seed)+ ".png"  
+                    key = "/tmp/" + str(artifact.seed)+ ".png"
+                    # key = str(artifact.seed)+ ".png"  
                     s3.upload_file(key,bucket,str(artifact.seed)+ ".png",ExtraArgs={'ACL': 'public-read', 'ContentType': "image/jpg, image/png, image/jpeg"})
                     return_dict["completion"] = True
                     return_dict["message"] = "Successful upload"
@@ -72,4 +81,3 @@ def lambda_handler(event, context):
         return_dict["message"] = e
         return return_dict
     
-print(lambda_handler({'phrase':"A blue bird on a hill"}, None))

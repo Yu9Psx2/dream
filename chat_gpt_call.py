@@ -19,7 +19,8 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
             messages=messages)
 #If this is the subsequent times the script is run for the user, access the script using the built up messages.
     else:
-#ChatGPT tends not to introduce downside to the story, so we introduce an element of chance that the story goes wrong            
+#ChatGPT tends not to introduce downside to the story, so we introduce an element of chance that the story goes wrong
+        outcome = ""            
         if good_flag == True:
             outcome = ". The story should take an unexpectedly negative path in your response." if (random.randint(0,10) > 7) else ""
             good_flag == False

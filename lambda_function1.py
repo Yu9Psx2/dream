@@ -20,10 +20,10 @@ def lambda_handler(event, context):
                 "message":None,
                 }
     phrase = event['phrase']
-    
-    access_key=os.environ.get('REACT_APP_accessKeyId')
-    secret_key=os.environ.get('REACT_APP_secretAccessKey')
     try:
+
+        access_key=os.environ.get('REACT_APP_accessKeyId')
+        secret_key=os.environ.get('REACT_APP_secretAccessKey')
         s3 = boto3.client('s3', aws_access_key_id=access_key,aws_secret_access_key=secret_key)
 
         dream = os.environ.get('dream')
@@ -60,16 +60,18 @@ def lambda_handler(event, context):
                     img = Image.open(img_bytes)
                     img.save("/tmp/" + str(artifact.seed)+ ".png") 
                     img_bytes.seek(0)
-                    bucket_name = bucket
-                    key = "/tmp/" + str(artifact.seed)+ ".png"  
-                    s3.upload_file(key,bucket,str(artifact.seed)+ ".png",ExtraArgs={'ACL': 'public-read', 'ContentType': "image/jpg, image/png, image/jpeg"})
+                    bucket_name = bucket1
+                    key = str(artifact.seed)+ ".png"  
+                    s3.upload_file(key,bucket,ExtraArgs={'ACL': 'public-read', 'ContentType': "image/jpg, image/png, image/jpeg"})
                     return_dict["completion"] = True
                     return_dict["message"] = "Successful upload"
-                    return_dict["url"] = "https://picturebucket133234-dev.s3.amazonaws.com/" + str(artifact.seed)+ ".png"
+                    return_dict["url"] = "https://picturebucket133234-dev.s3.amazonaws.com/" + key
                     print(return_dict["url"])
                     return return_dict
     except Exception as e:
-        return_dict["message"] = e
+        log.exception('An Error Happened')
+        return_dict['error'] = log_stream.getvalue()
         return return_dict
     
+
 print(lambda_handler({'phrase':"A blue bird on a hill"}, None))

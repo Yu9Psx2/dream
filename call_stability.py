@@ -30,8 +30,8 @@ def call_stability(story, option):
         # Set up our initial generation parameters.
         answers = stability_api.generate(
             prompt=phrase,   
-            steps=30, 
-            cfg_scale=8.0, 
+            steps=75, 
+            cfg_scale=11.0, 
             width=512, 
             height=512, 
             samples=1, 
@@ -45,12 +45,12 @@ def call_stability(story, option):
                 if artifact.type == generation.ARTIFACT_IMAGE:
                     img_bytes = io.BytesIO(artifact.binary)
                     img = Image.open(img_bytes)
-                    # img.save("/tmp/" + str(artifact.seed)+ ".png")
-                    img.save(str(artifact.seed)+ ".png") 
+                    img.save("/tmp/" + str(artifact.seed)+ ".png")
+                    # img.save(str(artifact.seed)+ ".png") 
                     img_bytes.seek(0)
                     bucket_name = bucket
-                    # key = "/tmp/" + str(artifact.seed)+ ".png"
-                    key = str(artifact.seed)+ ".png"  
+                    key = "/tmp/" + str(artifact.seed)+ ".png"
+                    # key = str(artifact.seed)+ ".png"  
                     s3.upload_file(key,bucket,str(artifact.seed)+ ".png",ExtraArgs={'ACL': 'public-read', 'ContentType': "image/jpg, image/png, image/jpeg"})
                     return_dict["completion"] = True
                     return_dict["message"] = "Successful upload"

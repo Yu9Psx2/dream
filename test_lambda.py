@@ -1,6 +1,6 @@
 from lambda_function import lambda_handler
 
-holder = lambda_handler(event = {"phrase":"a day at buckingham",
+holder = lambda_handler(event = {"phrase":"a day working as an accountant at a fortune 500 company",
                         "story": {
                             "returned_messages":None,
                             "returned_good_flag":None,
@@ -13,7 +13,7 @@ returned_messages = holder['story']['returned_messages']
 returned_iterator = holder['story']['returned_iterator']
 returned_good_flag = holder['story']['returned_good_flag']
 
-holder2 = lambda_handler(event = {"phrase":"a day at buckingham",
+holder2 = lambda_handler(event = {"phrase":"a day working as an accountant at a fortune 500 company",
                         "story": {
                             "returned_messages":returned_messages,
                             "returned_good_flag":None,

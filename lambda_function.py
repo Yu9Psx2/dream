@@ -9,6 +9,7 @@ import boto3
 import logging
 from chat_gpt_call import access_api
 from call_stability import call_stability
+import concurrent.futures
 
 def lambda_handler(event, context):
     #Code is modified from dream studio example found at: https://platform.stability.ai/docs/getting-started/authentication
@@ -28,12 +29,17 @@ def lambda_handler(event, context):
     access_key=os.environ.get('REACT_APP_accessKeyId')
     secret_key=os.environ.get('REACT_APP_secretAccessKey')
     try:
-        for key in returned_options:
-            response = call_stability(return_dict['story']['returned_messages'][-1]['content'], key)
-            if response["url"]:
-                returned_options[key] = response["url"]
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future_to_key = {executor.submit(call_stability, return_dict['story']['returned_messages'][-1]['content'], key): key for key in returned_options}
+            for future in concurrent.futures.as_completed(future_to_key):
+                key = future_to_key[future]
+                try:
+                    response = future.result()
+                    if response["url"]:
+                        returned_options[key] = response["url"]
+                except Exception as e:
+                    print(f"Error: {e}")
         return return_dict
     except Exception as e:
         return_dict["message"] = e
         return return_dict
-    

@@ -45,12 +45,12 @@ def call_stability(story, option):
                 if artifact.type == generation.ARTIFACT_IMAGE:
                     img_bytes = io.BytesIO(artifact.binary)
                     img = Image.open(img_bytes)
-                    img.save("/tmp/" + str(artifact.seed)+ ".png")
-                    # img.save(str(artifact.seed)+ ".png") 
+                    # img.save("/tmp/" + str(artifact.seed)+ ".png")
+                    img.save(str(artifact.seed)+ ".png") 
                     img_bytes.seek(0)
                     bucket_name = bucket
-                    key = "/tmp/" + str(artifact.seed)+ ".png"
-                    # key = str(artifact.seed)+ ".png"  
+                    # key = "/tmp/" + str(artifact.seed)+ ".png"
+                    key = str(artifact.seed)+ ".png"  
                     s3.upload_file(key,bucket,str(artifact.seed)+ ".png",ExtraArgs={'ACL': 'public-read', 'ContentType': "image/jpg, image/png, image/jpeg"})
                     return_dict["completion"] = True
                     return_dict["message"] = "Successful upload"

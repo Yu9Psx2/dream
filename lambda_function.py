@@ -9,7 +9,7 @@ import boto3
 import logging
 from chat_gpt_call import access_api
 import json
-
+from chat_gpt_image_prompt import get_image_prompt
 
 log = logging.getLogger(__name__)
 log_stream = io.StringIO()    
@@ -33,10 +33,8 @@ def lambda_handler(event, context):
     secret_key=os.environ.get('REACT_APP_secretAccessKey')
     try:
         s3 = boto3.client('s3', aws_access_key_id=access_key,aws_secret_access_key=secret_key)
-
         dream = os.environ.get('dream')
         bucket = os.environ.get('bucket')
-
         os.environ['STABILITY_HOST'] = 'grpc.stability.ai:443'
         os.environ['STABILITY_KEY'] = dream
 

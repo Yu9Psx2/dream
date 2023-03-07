@@ -1,6 +1,5 @@
 import os
 import openai
-import csv
 import json
 import random
 
@@ -9,11 +8,12 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
 #Get API key and setup the options list
     openai.api_key = os.getenv("OPENAI_API_KEY")
     options = []
+    options2= {}
     end_flag = False
 #If this is the first time the script is run for the user, access the script using the initiating prompt.
     if not messages:
-            messages = [{"role": "system", "content": "You are a choose your own adventure book. When you present a decision point you should offer two or three possibilities, put the possibilities on the last line separated with semi-colons so that I can parse the response, like this: Option A. Do something; Option B. Do something else; Option C. Do something something else. As well, when you get to the end of the story, write 'the end' on a new line so that I can parse it"},
-            {"role": "user", "content": f"Write a choose-your own adventure story about {prompt}. For this prompt, provide me with the opening of the story to the first decision point."},]
+            messages = [{"role": "system", "content": "You are a choose your own adventure book. When you present a decision point you should offer two or three possibilities, put the possibilities on a new last line separated with semi-colons so that I can parse the response, like this: \nOption A. Do something; Option B. Do something else; Option C. Do something something else. As well, when you get to the end of the story, write 'the end' on a new line so that I can parse it"},
+            {"role": "user", "content": f"Write a choose-your own adventure story about {prompt}. For this prompt, provide me with the opening of the story to the first decision point. Remember you should offer two or three possibilities, put the possibilities on a new last line separated with semi-colons so that I can parse the response, like this: \nOption A. Do something; Option B. Do something else; Option C. Do something something else., "},]
             response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=messages)
@@ -29,7 +29,7 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
             good_flag == True
         user_response += outcome
         if iterator == 5:
-            user_response = user_response + "End the story in your next response"
+            user_response = user_response + "End the story in your next response and don't provide any more options"
         messages.append({"role":"user","content":user_response})
         response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -43,10 +43,15 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
     for i in content.split('\n'):
             if "Option" in i:
                     options.append(i.split('; '))
-    # print(options)
+    # print(f"This is options {options}")
+    for i in options[0]:
+            options2[i] = '' 
+    print(options2)
     messages.append({"role":role,"content":content})
     if "THE END" in content.split('\n')[-1].upper() or "THE END" in content.split('\n')[-1].upper():
         end_flag = True
+    if len(options) == 0:
+         end_flag = True
     iterator += 1
     outgoing_response = [messages, options, iterator, good_flag, end_flag]
     return outgoing_response

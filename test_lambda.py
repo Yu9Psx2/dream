@@ -21,3 +21,6 @@ holder2 = lambda_handler(event = {"phrase":"a day at buckingham",
                             "user_response":"option B",
                         }                        
                         }, context = None)
+
+
+print(holder2)

@@ -12,8 +12,8 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
     end_flag = False
 #If this is the first time the script is run for the user, access the script using the initiating prompt.
     if not messages:
-            messages = [{"role": "system", "content": "You are a choose your own adventure book. When you present a decision point you should offer two or three possibilities, put the possibilities on a new last line separated with semi-colons so that I can parse the response, like this: \nOption A. Do something; Option B. Do something else; Option C. Do something something else. As well, when you get to the end of the story, write 'the end' on a new line so that I can parse it"},
-            {"role": "user", "content": f"Write a choose-your own adventure story about {prompt}. For this prompt, provide me with the opening of the story to the first decision point. Remember you should offer two or three possibilities, put the possibilities on a new last line separated with semi-colons so that I can parse the response, like this: \nOption A. Do something; Option B. Do something else; Option C. Do something something else., "},]
+            messages = [{"role": "system", "content": "You are a choose your own adventure book. When you present a decision point you should offer two or three possibilities, and put each of the possibilities on a its own new line so that I can parse the response. Make sure to label these options such as Option A, Option B, Option C. Write 'the end' on a new line when the story is over so that I can parse it"},
+            {"role": "user", "content": f"Write a choose-your own adventure story about {prompt}. For this prompt, provide me with the opening of the story to the first decision point. Remember you should offer two or three possibilities, and put each of the possibilities on its own new line so that I can parse the response. Make sure to label these options such as Option A, Option B, Option C."},]
             response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=messages)
@@ -42,9 +42,9 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
     print(content)
     for i in content.split('\n'):
             if "Option" in i:
-                    options.append(i.split('; '))
+                    options.append(i)
     # print(f"This is options {options}")
-    for i in options[0]:
+    for i in options:
             options2[i] = '' 
     print(options2)
     messages.append({"role":role,"content":content})
@@ -53,6 +53,6 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
     if len(options) == 0:
          end_flag = True
     iterator += 1
-    outgoing_response = [messages, options, iterator, good_flag, end_flag]
+    outgoing_response = [messages, options2, iterator, good_flag, end_flag]
     return outgoing_response
 

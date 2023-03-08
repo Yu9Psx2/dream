@@ -40,7 +40,7 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
     content = message['content']
     role = message['role']
     # print(content)
-    for i in content.split('\n'):
+    for i in content.split('\n')[1:]:
             if "Option" in i:
                     options.append(i)
     # print(f"This is options {options}")

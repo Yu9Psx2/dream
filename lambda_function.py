@@ -11,6 +11,7 @@ from chat_gpt_call import access_api
 from call_stability import call_stability
 import concurrent.futures
 import time
+from get_header import header_getter
 
 def lambda_handler(event, context):
     start_time = time.time()
@@ -31,6 +32,7 @@ def lambda_handler(event, context):
     access_key=os.environ.get('REACT_APP_accessKeyId')
     secret_key=os.environ.get('REACT_APP_secretAccessKey')
     try:
+        return_dict['url'] = header_getter(phrase)
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future_to_key = {executor.submit(call_stability, return_dict['story']['returned_messages'][-1]['content'], key): key for key in returned_options}
             for future in concurrent.futures.as_completed(future_to_key):
@@ -43,6 +45,8 @@ def lambda_handler(event, context):
                     print(f"Error: {e}")
         end_time = time.time()
         elapsed_time = end_time - start_time
+        return_dict["message"] = "Completed"
+        return_dict["completion"] = "True"
         if elapsed_time < 30:
             time.sleep(30 - elapsed_time)
         return return_dict
@@ -50,6 +54,7 @@ def lambda_handler(event, context):
         return_dict["message"] = e
         end_time = time.time()
         elapsed_time = end_time - start_time
+        print(e)
         if elapsed_time < 30:
             time.sleep(30 - elapsed_time)
         return return_dict

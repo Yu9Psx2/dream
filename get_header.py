@@ -7,7 +7,7 @@ import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 import boto3
 from chat_gpt_image_prompt import get_image_prompt
 
-def call_stability(story, option):
+def header_getter(story, style = ". In anime style."):
     return_dict = {"completion": False,
             "url": None,
             "message":None,
@@ -19,11 +19,9 @@ def call_stability(story, option):
     bucket = os.environ.get('bucket')
     os.environ['STABILITY_HOST'] = 'grpc.stability.ai:443'
     os.environ['STABILITY_KEY'] = dream
+    story = story + style
     try:
-        # Free chatGPT is rate-limited, when the service is fast (early morning) this option needs to be off when testing
-        phrase = get_image_prompt(story, option)
-        print(phrase)
-        # phrase = option
+
         stability_api = client.StabilityInference(
             key=os.environ['STABILITY_KEY'], 
             verbose=True, 
@@ -32,10 +30,10 @@ def call_stability(story, option):
         )
         # Set up our initial generation parameters.
         answers = stability_api.generate(
-            prompt=phrase,   
+            prompt=story,   
             steps=75, 
             cfg_scale=11.0, 
-            width=512, 
+            width=1024, 
             height=512, 
             samples=1, 
             sampler=generation.SAMPLER_K_DPMPP_2M)

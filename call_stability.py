@@ -20,7 +20,10 @@ def call_stability(story, option):
     os.environ['STABILITY_HOST'] = 'grpc.stability.ai:443'
     os.environ['STABILITY_KEY'] = dream
     try:
+        # Free chatGPT is rate-limited, when the service is fast (early morning) this option needs to be off when testing
         phrase = get_image_prompt(story, option)
+        print(phrase)
+        # phrase = option
         stability_api = client.StabilityInference(
             key=os.environ['STABILITY_KEY'], 
             verbose=True, 
@@ -45,17 +48,17 @@ def call_stability(story, option):
                 if artifact.type == generation.ARTIFACT_IMAGE:
                     img_bytes = io.BytesIO(artifact.binary)
                     img = Image.open(img_bytes)
-                    # img.save("/tmp/" + str(artifact.seed)+ ".png")
-                    img.save(str(artifact.seed)+ ".png") 
+                    img.save("/tmp/" + str(artifact.seed)+ ".png")
+                    # img.save(str(artifact.seed)+ ".png") 
                     img_bytes.seek(0)
                     bucket_name = bucket
-                    # key = "/tmp/" + str(artifact.seed)+ ".png"
-                    key = str(artifact.seed)+ ".png"  
+                    key = "/tmp/" + str(artifact.seed)+ ".png"
+                    # key = str(artifact.seed)+ ".png"  
                     s3.upload_file(key,bucket,str(artifact.seed)+ ".png",ExtraArgs={'ACL': 'public-read', 'ContentType': "image/jpg, image/png, image/jpeg"})
                     return_dict["completion"] = True
                     return_dict["message"] = "Successful upload"
                     return_dict["url"] = "https://picturebucket133234-dev.s3.amazonaws.com/" + str(artifact.seed)+ ".png"
-                    print(return_dict["url"])
+                    # print(return_dict["url"])
                     return return_dict
     except Exception as e:
         return_dict["message"] = e

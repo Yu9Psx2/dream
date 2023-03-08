@@ -10,8 +10,10 @@ import logging
 from chat_gpt_call import access_api
 from call_stability import call_stability
 import concurrent.futures
+import time
 
 def lambda_handler(event, context):
+    start_time = time.time()
     #Code is modified from dream studio example found at: https://platform.stability.ai/docs/getting-started/authentication
     return_dict = {"completion": False,
                 "url": None,
@@ -39,7 +41,15 @@ def lambda_handler(event, context):
                         returned_options[key] = response["url"]
                 except Exception as e:
                     print(f"Error: {e}")
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        if elapsed_time < 30:
+            time.sleep(30 - elapsed_time)
         return return_dict
     except Exception as e:
         return_dict["message"] = e
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        if elapsed_time < 30:
+            time.sleep(30 - elapsed_time)
         return return_dict

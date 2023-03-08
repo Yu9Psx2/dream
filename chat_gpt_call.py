@@ -39,14 +39,14 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
     message = response_json['choices'][0]['message']
     content = message['content']
     role = message['role']
-    print(content)
+    # print(content)
     for i in content.split('\n'):
             if "Option" in i:
                     options.append(i)
     # print(f"This is options {options}")
     for i in options:
             options2[i] = '' 
-    print(options2)
+    # print(options2)
     messages.append({"role":role,"content":content})
     if "THE END" in content.split('\n')[-1].upper() or "THE END" in content.split('\n')[-1].upper():
         end_flag = True

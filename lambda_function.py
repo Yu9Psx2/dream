@@ -25,7 +25,7 @@ def lambda_handler(event, context):
     returned_options = {}
 
      #access chat GPT to progress the story:
-    while len(returned_options) < 2 or len(returned_options) > 3:
+    while len(returned_options) == 1 or len(returned_options) > 3:
         returned_messages, returned_options, returned_iterator, returned_good_flag, returned_end_flag = access_api(prompt=event['phrase'], 
                                                                                                                 messages=story.get("returned_messages",None),
                                                                                                                 user_response = story.get("user_response", None), 
@@ -37,7 +37,8 @@ def lambda_handler(event, context):
     access_key=os.environ.get('REACT_APP_accessKeyId')
     secret_key=os.environ.get('REACT_APP_secretAccessKey')
     try:
-        return_dict['url'] = header_getter(phrase)
+        if return_dict['url'] == None:
+            return_dict['url'] = header_getter(phrase)
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future_to_key = {executor.submit(call_stability, return_dict['story']['returned_messages'][-1]['content'], key): key for key in returned_options}
             for future in concurrent.futures.as_completed(future_to_key):

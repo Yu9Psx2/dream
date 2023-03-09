@@ -12,8 +12,16 @@ def access_api(prompt=None, messages=None,user_response = None, good_flag = True
     end_flag = False
 #If this is the first time the script is run for the user, access the script using the initiating prompt.
     if not messages:
-            messages = [{"role": "system", "content": "You are a choose your own adventure book. When you present a decision point you should offer two or three possibilities, and put each of the possibilities on a its own new line so that I can parse the response. Make sure to label these options such as Option A, Option B, Option C. Write 'the end' on a new line when the story is over so that I can parse it"},
-            {"role": "user", "content": f"Write a choose-your own adventure story about {prompt}. For this prompt, provide me with the opening of the story to the first decision point. Remember you should offer two or three possibilities, and put each of the possibilities on its own new line so that I can parse the response. Make sure to label these options such as Option A, Option B, Option C."},]
+            messages = [{"role": "system", "content": """You are a choose your own adventure book. When you present a decision point you should offer two or three possibilities, and put each of the possibilities on a its own new line so that I can parse the response. Make sure to label these options such as Option A, Option B, Option C. Write 'the end' on a new line when the story is over so that I can parse it. An example of a correctly formatted response is: You are hiking in the woods, enjoying the beautiful scenery around you when suddenly you hear a rustling in the bushes. You turn to see a massive bear charging in your direction. Your heart racing, you have to think fast. What will you do?
+
+Option A: Climb the nearest tree to try and get out of reach of the bear.
+Option B: Stand completely still and hope that the bear will lose interest and leave.
+Option C: Head towards the nearest body of water in hopes of confusing the bear."""},
+            {"role": "user", "content": f"""Write a choose-your own adventure story about {prompt}. For this prompt, provide me with the opening of the story to the first decision point. Remember you should offer two or three possibilities, and put each of the possibilities on its own new line so that I can parse the response. Make sure to label these options such as Option A, Option B, Option C. An example of a correctly formatted response is: You are hiking in the woods, enjoying the beautiful scenery around you when suddenly you hear a rustling in the bushes. You turn to see a massive bear charging in your direction. Your heart racing, you have to think fast. What will you do?
+
+Option A: Climb the nearest tree to try and get out of reach of the bear.
+Option B: Stand completely still and hope that the bear will lose interest and leave.
+Option C: Head towards the nearest body of water in hopes of confusing the bear."""},]
             response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=messages)
